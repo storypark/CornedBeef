@@ -7,6 +7,11 @@ import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.core.internal.deps.guava.util.concurrent.SettableFuture;
+
+import java.util.concurrent.ExecutionException;
+
 public final class TestHelper {
 
     private static final int TIMEOUT = 1000;
@@ -19,13 +24,16 @@ public final class TestHelper {
      * Call {@link CoachMark#show()} on the given {@link CoachMark}
      */
     public static void showCoachMark(final Instrumentation instrumentation, final CoachMark coachMark) {
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                coachMark.show();
-            }
+        instrumentation.runOnMainSync(() -> {
+            coachMark.show();
         });
         instrumentation.waitForIdleSync();
+        try {
+            // Don't trust that the waitForIdleSync actually waited long enough to be ready for touch events
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -33,12 +41,9 @@ public final class TestHelper {
      * on the given {@link CoachMark}
      */
     public static void dismissCoachMark(final Instrumentation instrumentation, final CoachMark coachMark) {
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                if (coachMark != null) {
-                    coachMark.dismiss();
-                }
+        instrumentation.runOnMainSync(() -> {
+            if (coachMark != null) {
+                coachMark.dismiss();
             }
         });
         instrumentation.waitForIdleSync();
@@ -47,6 +52,7 @@ public final class TestHelper {
     /**
      * Wait until the status bar is fully hidden
      */
+    @SuppressWarnings("BusyWait")
     public static void waitUntilStatusBarHidden(final Activity activity) {
         final Rect rect = new Rect();
         final long startTime = SystemClock.uptimeMillis();
@@ -71,12 +77,7 @@ public final class TestHelper {
         params.leftMargin = x;
         params.topMargin = y;
 
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                anchor.setLayoutParams(params);
-            }
-        });
+        instrumentation.runOnMainSync(() -> anchor.setLayoutParams(params));
         instrumentation.waitForIdleSync();
     }
 
@@ -90,13 +91,14 @@ public final class TestHelper {
         params.leftMargin = x;
         params.topMargin = y;
 
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                mTargetView.setLayoutParams(params);
-            }
-        });
+        instrumentation.runOnMainSync(() -> mTargetView.setLayoutParams(params));
         instrumentation.waitForIdleSync();
     }
 
+    @SuppressWarnings("unchecked")
+    public static  <T extends Activity> T getActivity(ActivityScenario<T> activityScenario) throws ExecutionException, InterruptedException {
+        SettableFuture<T> activityRef = SettableFuture.create();
+        activityScenario.onActivity(activityRef::set);
+        return (T) activityRef.get();
+    }
 }

@@ -19,7 +19,6 @@ import com.swiftkey.cornedbeef.LayeredCoachMark;
 import com.swiftkey.cornedbeef.PunchHoleCoachMark;
 
 public class SpamActivity extends Activity {
-    private static final String TAG = SpamActivity.class.getSimpleName();
 
     private CoachMark mBubbleCoachMark;
     private CoachMark mHighlightCoachMark;
@@ -44,18 +43,8 @@ public class SpamActivity extends Activity {
                 .setTargetOffset(0.25f)
                 .setShowBelowAnchor(true)
                 .setPadding(10)
-                .setOnShowListener(new CoachMark.OnShowListener() {
-                    @Override
-                    public void onShow() {
-                        Toast.makeText(context, "Bubble coach mark shown!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setOnDismissListener(new CoachMark.OnDismissListener() {
-                    @Override
-                    public void onDismiss() {
-                        Toast.makeText(context, "Bubble coach mark dismissed!", Toast.LENGTH_SHORT).show();
-                    }
-                })
+                .setOnShowListener(() -> Toast.makeText(context, "Bubble coach mark shown!", Toast.LENGTH_SHORT).show())
+                .setOnDismissListener(() -> Toast.makeText(context, "Bubble coach mark dismissed!", Toast.LENGTH_SHORT).show())
                 .build();
 
         mHighlightCoachMark = new HighlightCoachMark.HighlightCoachMarkBuilder(
@@ -67,18 +56,8 @@ public class SpamActivity extends Activity {
         mPunchHoleCoachMark = new PunchHoleCoachMark.PunchHoleCoachMarkBuilder(
                 context, anchorLinearLayoutHoldButton, punchholeContent)
                 .setTargetView(findViewById(R.id.punch_hole_coach_mark_target))
-                .setOnTargetClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(context, "The target punch hole clicked!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setOnGlobalClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(context, "The coach mark clicked!", Toast.LENGTH_SHORT).show();
-                    }
-                })
+                .setOnTargetClickListener(view -> Toast.makeText(context, "The target punch hole clicked!", Toast.LENGTH_SHORT).show())
+                .setOnGlobalClickListener(view -> Toast.makeText(context, "The coach mark clicked!", Toast.LENGTH_SHORT).show())
                 .setPunchHolePadding(5)
                 .setTimeout(0)
                 .build();
@@ -92,26 +71,18 @@ public class SpamActivity extends Activity {
         layeredImageView.setImageDrawable(getResources().getDrawable(R.drawable.sk_logo));
         layeredTextView.setText(R.string.layered_message_text);
         layeredButton.setText(R.string.layered_button_text);
-        layeredButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context, "The button clicked!", Toast.LENGTH_SHORT).show();
-            }
-        });
+        layeredButton.setOnClickListener(v -> Toast.makeText(context, "The button clicked!", Toast.LENGTH_SHORT).show());
 
         mLayeredCoachMark = new LayeredCoachMark.LayeredCoachMarkBuilder(
                 context, anchorEmptyLinearLayout, layeredContent)
                 .setTimeout(0)
                 .build();
 
-        getWindow().getDecorView().getRootView().post(new Runnable() {
-            @Override
-            public void run() {
-                mBubbleCoachMark.show();
-                mHighlightCoachMark.show();
-                mPunchHoleCoachMark.show();
-                mLayeredCoachMark.show();
-            }
+        getWindow().getDecorView().getRootView().post(() -> {
+            mBubbleCoachMark.show();
+            mHighlightCoachMark.show();
+            mPunchHoleCoachMark.show();
+            mLayeredCoachMark.show();
         });
     }
 

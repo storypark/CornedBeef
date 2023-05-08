@@ -1,17 +1,15 @@
 plugins {
-    id "maven-publish"
+    id 'maven-publish'
+    id 'com.android.library'
 }
 
-apply plugin: 'com.android.library'
-
 android {
-    compileSdkVersion 28
+    namespace 'com.swiftkey.cornedbeef'
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 12
-        targetSdkVersion 28
-        versionCode 11
-        versionName "2.0.5"
+        targetSdkVersion 33
     }
     buildTypes {
         release {
@@ -19,12 +17,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    publishing {
+        multipleVariants {
+            withSourcesJar()
+            withJavadocJar()
+            allVariants()
+        }
+    }
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.annotation:annotation:1.6.0'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:3.0'
     testImplementation 'org.mockito:mockito-core:2.28.2'
 }

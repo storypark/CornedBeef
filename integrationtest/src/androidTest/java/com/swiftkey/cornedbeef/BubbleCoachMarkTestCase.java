@@ -86,7 +86,7 @@ public class BubbleCoachMarkTestCase {
         showCoachMark(getInstrumentation(), mCoachMark);
         
         ViewGroup content = (ViewGroup) mCoachMark.getContentView()
-                .findViewById(R.id.coach_mark_content);
+                .findViewById(com.swiftkey.cornedbeef.R.id.coach_mark_content);
         TextView tv = (TextView) content.getChildAt(0);
         
         // Get anchor and content positions
@@ -95,8 +95,8 @@ public class BubbleCoachMarkTestCase {
         mAnchor.getLocationOnScreen(anchorPos);
         mCoachMark.getContentView().getLocationOnScreen(contentPos);
         
-        topArrow = mCoachMark.getContentView().findViewById(R.id.top_arrow);
-        bottomArrow = mCoachMark.getContentView().findViewById(R.id.bottom_arrow);
+        topArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.top_arrow);
+        bottomArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.bottom_arrow);
 
         assertEquals("spam spam spam", tv.getText());
         assertTrue(mCoachMark.isShowing());
@@ -116,7 +116,7 @@ public class BubbleCoachMarkTestCase {
         showCoachMark(getInstrumentation(), mCoachMark);
 
         ViewGroup content = (ViewGroup) mCoachMark.getContentView()
-                .findViewById(R.id.coach_mark_content);
+                .findViewById(com.swiftkey.cornedbeef.R.id.coach_mark_content);
         TextView tv = (TextView) content.getChildAt(0);
         
         // Get anchor and content positions
@@ -125,8 +125,8 @@ public class BubbleCoachMarkTestCase {
         mAnchor.getLocationOnScreen(anchorPos);
         mCoachMark.getContentView().getLocationOnScreen(contentPos);
         
-        topArrow = mCoachMark.getContentView().findViewById(R.id.top_arrow);
-        bottomArrow = mCoachMark.getContentView().findViewById(R.id.bottom_arrow);
+        topArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.top_arrow);
+        bottomArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.bottom_arrow);
 
         assertEquals("spam spam spam", tv.getText());
         assertTrue(mCoachMark.isShowing());
@@ -152,7 +152,7 @@ public class BubbleCoachMarkTestCase {
         showCoachMark(getInstrumentation(), mCoachMark);
 
         ViewGroup content = (ViewGroup) mCoachMark.getContentView()
-                .findViewById(R.id.coach_mark_content);
+                .findViewById(com.swiftkey.cornedbeef.R.id.coach_mark_content);
         TextView tv = (TextView) content.getChildAt(0);
         
         // Get anchor and content positions
@@ -161,8 +161,8 @@ public class BubbleCoachMarkTestCase {
         mAnchor.getLocationOnScreen(anchorPos);
         mCoachMark.getContentView().getLocationOnScreen(contentPos);
         
-        topArrow = mCoachMark.getContentView().findViewById(R.id.top_arrow);
-        bottomArrow = mCoachMark.getContentView().findViewById(R.id.bottom_arrow);
+        topArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.top_arrow);
+        bottomArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.bottom_arrow);
 
         assertEquals("spam spam spam", tv.getText());
         assertTrue(mCoachMark.isShowing());
@@ -181,7 +181,7 @@ public class BubbleCoachMarkTestCase {
         
         showCoachMark(getInstrumentation(), mCoachMark);
         
-        View arrow = mCoachMark.getContentView().findViewById(R.id.top_arrow);
+        View arrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.top_arrow);
         MarginLayoutParams params = (MarginLayoutParams) arrow.getLayoutParams();
 
         assertTrue(mCoachMark.isShowing());
@@ -198,7 +198,7 @@ public class BubbleCoachMarkTestCase {
         
         showCoachMark(getInstrumentation(), mCoachMark);
         
-        View arrow = mCoachMark.getContentView().findViewById(R.id.top_arrow);
+        View arrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.top_arrow);
         MarginLayoutParams params = (MarginLayoutParams) arrow.getLayoutParams();
 
         assertTrue(mCoachMark.isShowing());
@@ -245,8 +245,8 @@ public class BubbleCoachMarkTestCase {
     public void testPopupMovesWhenAnchorMoves() {
         int[] anchorPos = new int[2];
         int[] contentPos = new int[2];
-        final View topArrow = mCoachMark.getContentView().findViewById(R.id.top_arrow);
-        final View bottomArrow = mCoachMark.getContentView().findViewById(R.id.bottom_arrow);
+        final View topArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.top_arrow);
+        final View bottomArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.bottom_arrow);
 
         showCoachMark(getInstrumentation(), mCoachMark);
         
@@ -290,8 +290,8 @@ public class BubbleCoachMarkTestCase {
         moveAnchor(getInstrumentation(), mAnchor, 0, 600);
         showCoachMark(getInstrumentation(), mCoachMark);
         
-        final View topArrow = mCoachMark.getContentView().findViewById(R.id.top_arrow);
-        final View bottomArrow = mCoachMark.getContentView().findViewById(R.id.bottom_arrow);
+        final View topArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.top_arrow);
+        final View bottomArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.bottom_arrow);
         mAnchor.getLocationOnScreen(anchorPos);
         mCoachMark.getContentView().getLocationOnScreen(contentPos);
 
@@ -317,8 +317,8 @@ public class BubbleCoachMarkTestCase {
         moveAnchor(getInstrumentation(), mAnchor, 0, 200);
         showCoachMark(getInstrumentation(), mCoachMark);
         
-        final View topArrow = mCoachMark.getContentView().findViewById(R.id.top_arrow);
-        final View bottomArrow = mCoachMark.getContentView().findViewById(R.id.bottom_arrow);
+        final View topArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.top_arrow);
+        final View bottomArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.bottom_arrow);
         final int popupHeight = mCoachMark.getContentView().getHeight();
         mAnchor.getLocationOnScreen(anchorPos);
         mCoachMark.getContentView().getLocationOnScreen(contentPos);
@@ -350,7 +350,7 @@ public class BubbleCoachMarkTestCase {
         
         mAnchor.getLocationOnScreen(anchorPos);
         mCoachMark.getContentView().getLocationOnScreen(contentPos);       
-        View arrow = mCoachMark.getContentView().findViewById(R.id.top_arrow);
+        View arrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.top_arrow);
         MarginLayoutParams params = (MarginLayoutParams) arrow.getLayoutParams();
 
         assertTrue(mCoachMark.isShowing());
@@ -402,9 +402,9 @@ public class BubbleCoachMarkTestCase {
         showCoachMark(getInstrumentation(), mCoachMark);
 
         assertTrue(mCoachMark.isShowing());
-        final ImageView topArrow = mCoachMark.getContentView().findViewById(R.id.top_arrow);
-        final ImageView bottomArrow = mCoachMark.getContentView().findViewById(R.id.bottom_arrow);
-        final LinearLayout contentHolder = mCoachMark.getContentView().findViewById(R.id.coach_mark_content);
+        final ImageView topArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.top_arrow);
+        final ImageView bottomArrow = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.bottom_arrow);
+        final LinearLayout contentHolder = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.coach_mark_content);
         assertEquals(color, topArrow.getImageTintList().getDefaultColor());
         assertEquals(color, bottomArrow.getImageTintList().getDefaultColor());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -430,7 +430,7 @@ public class BubbleCoachMarkTestCase {
 
         assertTrue(mCoachMark.isShowing());
 
-        final ViewGroup content = mCoachMark.getContentView().findViewById(R.id.coach_mark_content);
+        final ViewGroup content = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.coach_mark_content);
         final TextView tv = (TextView) content.getChildAt(0);
         assertEquals(color, tv.getCurrentTextColor());
     }
@@ -454,7 +454,7 @@ public class BubbleCoachMarkTestCase {
     @Test
     public void testNonTextCoachMark() {
         final ImageView imageView = new ImageView(mActivity);
-        imageView.setImageResource(R.drawable.ic_pointy_mark_up);
+        imageView.setImageResource(com.swiftkey.cornedbeef.R.drawable.ic_pointy_mark_up);
         mCoachMark = new BubbleCoachMark.BubbleCoachMarkBuilder(
                 mActivity,
                 mAnchor,
@@ -465,7 +465,7 @@ public class BubbleCoachMarkTestCase {
 
         assertTrue(mCoachMark.isShowing());
 
-        final ViewGroup content = mCoachMark.getContentView().findViewById(R.id.coach_mark_content);
+        final ViewGroup content = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.coach_mark_content);
         assertTrue(content.getChildAt(0) instanceof ImageView);
     }
 }

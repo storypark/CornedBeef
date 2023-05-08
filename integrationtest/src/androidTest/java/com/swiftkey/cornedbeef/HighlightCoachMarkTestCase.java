@@ -104,7 +104,7 @@ public class HighlightCoachMarkTestCase {
     @Test
     public void testNonTextCoachMark() {
         final ImageView imageView = new ImageView(mActivity);
-        imageView.setImageResource(R.drawable.ic_pointy_mark_up);
+        imageView.setImageResource(com.swiftkey.cornedbeef.R.drawable.ic_pointy_mark_up);
         mCoachMark = new HighlightCoachMark.HighlightCoachMarkBuilder(
                 mActivity,
                 mAnchor,

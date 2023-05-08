@@ -166,19 +166,16 @@ public abstract class CoachMark {
 
         // Dismiss coach mark after the timeout has passed if it is greater than 0.
         if (mTimeoutInMs > 0) {
-            mTimeoutDismissRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    if(mPopup.isShowing()) {
-                        if (mTimeoutListener != null) {
-                            mTimeoutListener.onTimeout();
-                        }
-                        try {
-                            dismiss();
-                        } catch(IllegalArgumentException e) {
-                            // Closes #19 - popup has already been removed outside of CornedBeef's
-                            // control
-                        }
+            mTimeoutDismissRunnable = () -> {
+                if(mPopup.isShowing()) {
+                    if (mTimeoutListener != null) {
+                        mTimeoutListener.onTimeout();
+                    }
+                    try {
+                        dismiss();
+                    } catch(IllegalArgumentException e) {
+                        // Closes #19 - popup has already been removed outside of CornedBeef's
+                        // control
                     }
                 }
             };

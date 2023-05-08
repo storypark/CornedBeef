@@ -75,7 +75,7 @@ public class LayeredCoachMarkTestCase {
         showCoachMark(getInstrumentation(), mCoachMark);
 
         final View container = mCoachMark.getContentView();
-        final ViewGroup content = container.findViewById(R.id.coach_mark_content);
+        final ViewGroup content = container.findViewById(com.swiftkey.cornedbeef.R.id.coach_mark_content);
         TextView tv = (TextView) content.getChildAt(0);
 
         // Check the creation
@@ -125,7 +125,7 @@ public class LayeredCoachMarkTestCase {
     @Test
     public void testNonTextCoachMark() {
         final ImageView imageView = new ImageView(mActivity);
-        imageView.setImageResource(R.drawable.ic_pointy_mark_up);
+        imageView.setImageResource(com.swiftkey.cornedbeef.R.drawable.ic_pointy_mark_up);
         mCoachMark = new LayeredCoachMark.LayeredCoachMarkBuilder(mActivity, mAnchor, imageView)
                 .build();
 
@@ -133,7 +133,7 @@ public class LayeredCoachMarkTestCase {
 
         assertTrue(mCoachMark.isShowing());
 
-        final ViewGroup content = mCoachMark.getContentView().findViewById(R.id.coach_mark_content);
+        final ViewGroup content = mCoachMark.getContentView().findViewById(com.swiftkey.cornedbeef.R.id.coach_mark_content);
         assertTrue(content.getChildAt(0) instanceof ImageView);
     }
 }

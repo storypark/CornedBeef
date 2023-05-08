@@ -1,29 +1,5 @@
 package com.swiftkey.cornedbeef;
 
-import android.graphics.Color;
-import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.annotation.ColorInt;
-import androidx.test.rule.ActivityTestRule;
-
-import com.swiftkey.cornedbeef.test.R;
-import com.swiftkey.cornedbeef.test.SpamActivity;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -37,16 +13,41 @@ import static com.swiftkey.cornedbeef.TestHelper.dismissCoachMark;
 import static com.swiftkey.cornedbeef.TestHelper.moveTargetView;
 import static com.swiftkey.cornedbeef.TestHelper.showCoachMark;
 import static com.swiftkey.cornedbeef.TestHelper.waitUntilStatusBarHidden;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.ColorInt;
+import androidx.test.core.app.ActivityScenario;
+
+import com.swiftkey.cornedbeef.test.R;
+import com.swiftkey.cornedbeef.test.SpamActivity;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.concurrent.ExecutionException;
 
 public class PunchHoleCoachMarkTestCase {
 
@@ -65,26 +66,20 @@ public class PunchHoleCoachMarkTestCase {
     private static final int PADDING = 10;
     private final int OVERLAY_COLOR = Color.BLACK;
 
-    @Rule
-    public ActivityTestRule<SpamActivity> mActivityRule =
-            new ActivityTestRule<>(SpamActivity.class, false, true);
-
     @Before
-    public void setUp() {
+    public void setUp() throws ExecutionException, InterruptedException {
         MockitoAnnotations.initMocks(this);
 
-        mActivity = mActivityRule.getActivity();
+        final ActivityScenario<SpamActivity> activityScenario = ActivityScenario.launch(SpamActivity.class);
+        mActivity = TestHelper.getActivity(activityScenario);
 
-        getInstrumentation().runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                mActivity.getWindow().setFlags(
-                        WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                mActivity.setContentView(R.layout.coach_mark_test_activity);
-                mAnchor = mActivity.findViewById(R.id.coach_mark_test_layout_anchor);
-                mTargetView = mActivity.findViewById(R.id.coach_mark_test_target);
-            }
+        getInstrumentation().runOnMainSync(() -> {
+            mActivity.getWindow().setFlags(
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            mActivity.setContentView(R.layout.coach_mark_test_activity);
+            mAnchor = mActivity.findViewById(R.id.coach_mark_test_layout_anchor);
+            mTargetView = mActivity.findViewById(R.id.coach_mark_test_target);
         });
         getInstrumentation().waitForIdleSync();
         waitUntilStatusBarHidden(mActivity);
@@ -167,6 +162,7 @@ public class PunchHoleCoachMarkTestCase {
         showCoachMark(getInstrumentation(), mCoachMark);
 
         final View container = mCoachMark.getContentView();
+        //noinspection unused
         final View target = container.findViewById(R.id.punch_hole_coach_mark_target);
 
         onView(is(mTargetView)).perform(click());
@@ -203,7 +199,7 @@ public class PunchHoleCoachMarkTestCase {
         // Check whether global listener is working on tapping textview(message)
         // The container view should be checked whether it is clicked or not.
         // Because tap event propagated to parent view when target view don't have listener.
-        onView(is((View) mTextView)).inRoot(isPlatformPopup()).perform(click());
+        onView(is(mTextView)).inRoot(isPlatformPopup()).perform(click());
 
         verify(mMockTargetClickListener, never()).onClick(any(View.class));
         verify(mMockCoachMarkClickListener, times(2)).onClick(any(View.class));
@@ -240,7 +236,7 @@ public class PunchHoleCoachMarkTestCase {
         final PunchHoleView container = (PunchHoleView) mCoachMark.getContentView();
 
         final float diameterGap = mActivity.getResources()
-                .getDimension(R.dimen.punchhole_coach_mark_gap);
+                .getDimension(com.swiftkey.cornedbeef.R.dimen.punchhole_coach_mark_gap);
 
         // Get the coach mark and target view's coordinates of location on screen
         int[] containerScreenLoc = new int[2];
@@ -356,7 +352,7 @@ public class PunchHoleCoachMarkTestCase {
     @Test
     public void testNonTextCoachMark() {
         final ImageView imageView = new ImageView(mActivity);
-        imageView.setImageResource(R.drawable.ic_pointy_mark_up);
+        imageView.setImageResource(com.swiftkey.cornedbeef.R.drawable.ic_pointy_mark_up);
         mCoachMark = new PunchHoleCoachMarkBuilder(mActivity, mAnchor, imageView)
                 .setTargetView(mTargetView)
                 .setHorizontalTranslationDuration(1000)
@@ -423,7 +419,7 @@ public class PunchHoleCoachMarkTestCase {
         assertFalse(intersection.intersect(targetCoords));
         assertEquals(
                 expectedSide,
-                ((Integer)textViewCoords.centerY()).compareTo(containerCoords.centerY()));
+                Integer.compare(textViewCoords.centerY(), containerCoords.centerY()));
     }
 
     private void setupCoachmark(final boolean animation) {
