@@ -1,3 +1,30 @@
+[![Download](https://jitpack.io/v/storypark/CornedBeef.svg)](https://jitpack.io/#storypark/CornedBeef)
+
+# Usage of fork
+
+Follow the guidelines from [jitpack.io](https://jitpack.io) to add the JitPack repository to your build file if you have not.
+
+Typically, this means an edit to your `build.gradle` file to add a new `repository` definition in the `allprojects` block, like this:
+
+```gradle
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+
+Then add the sqlite-android artifact from this repository as a dependency:
+
+```gradle
+dependencies {
+    implementation 'com.github.storypark:CornedBeef:master-SNAPSHOT'
+}
+```
+
+# Upstream - [TouchType/CornedBeef](https://github.com/TouchType/CornedBeef)
+
 *This is an open source library. Please do not create branches, public forks or pull requests containing sensitive information*
 
 # Float
