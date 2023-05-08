@@ -7,19 +7,19 @@ Follow the guidelines from [jitpack.io](https://jitpack.io) to add the JitPack r
 Typically, this means an edit to your `build.gradle` file to add a new `repository` definition in the `allprojects` block, like this:
 
 ```gradle
-	allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
+allprojects {
+  repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+  }
+}
 ```
 
 Then add the sqlite-android artifact from this repository as a dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.storypark:CornedBeef:master-SNAPSHOT'
+  implementation 'com.github.storypark:CornedBeef:master-SNAPSHOT'
 }
 ```
 
