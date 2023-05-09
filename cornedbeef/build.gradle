@@ -1,7 +1,20 @@
 plugins {
-    id 'maven-publish'
     id 'com.android.library'
+    id 'maven-publish'
 }
+
+def shortHeadVersion = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        standardOutput = stdout
+        commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
+    }
+    exec {
+        standardOutput = stdout
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+    }
+    return stdout.toString().replaceAll("[\\n\\r\\s]+", "-").trim().replaceAll("\\-+\$", "")
+}()
 
 android {
     namespace 'com.swiftkey.cornedbeef'
@@ -10,6 +23,7 @@ android {
     defaultConfig {
         minSdkVersion 12
         targetSdkVersion 33
+        versionName shortHeadVersion
     }
     buildTypes {
         release {
@@ -18,10 +32,9 @@ android {
         }
     }
     publishing {
-        multipleVariants {
+        singleVariant("release") {
             withSourcesJar()
             withJavadocJar()
-            allVariants()
         }
     }
 }
@@ -34,29 +47,15 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.28.2'
 }
 
-publishing {
-    repositories {
-
-        def user=project.properties['publish_user'] ?: "admin"
-        def pass=project.properties['publish_pass'] ?: "password"
-        def url=project.properties['publish_url'] ?: "http://localhost:8081"
-
-        maven {
-            setUrl(url)
-            credentials {
-                username = user
-                password = pass
+afterEvaluate {
+    publishing {
+        publications {
+            mavenAar(MavenPublication) {
+                from components.release
+                groupId = 'com.touchtype'
+                artifactId = project.getName()
+                version = android.defaultConfig.versionName
             }
-        }
-    }
-
-    publications {
-        aar(MavenPublication) {
-            groupId "TouchType"
-            version = android.defaultConfig.versionName
-            artifactId project.getName()
-
-            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
         }
     }
 }
