@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.View.OnAttachStateChangeListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewTreeObserver.OnPreDrawListener;
+import android.view.WindowManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -27,21 +28,21 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * A CoachMark is a temporary popup that can be positioned above a {@link View}
  * to notify the user about a new feature, proposition or other information.
- * 
- * CoachMarks are dismissed in two ways: 
- *  1) A pre-set timeout passed 
- *  2) The {@link CoachMark#dismiss()} method is called
- * 
+ * <p>
+ * CoachMarks are dismissed in two ways:
+ * 1) A pre-set timeout passed
+ * 2) The {@link CoachMark#dismiss()} method is called
+ * <p>
  * Coach marks can be very annoying to the user, SO PLEASE USE SPARINGLY!
- * 
+ *
  * @author lachie
- * 
  */
 public abstract class CoachMark {
 
     @IntDef({COACHMARK_PUNCHHOLE, COACHMARK_LAYERED, COACHMARK_HIGHLIGHT, COACHMARK_BUBBLE})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface CoachmarkType {}
+    public @interface CoachmarkType {
+    }
 
     public static final int COACHMARK_PUNCHHOLE = 0;
     public static final int COACHMARK_LAYERED = 1;
@@ -82,7 +83,7 @@ public abstract class CoachMark {
          */
         void onTimeout();
     }
-    
+
     protected final PopupWindow mPopup;
     protected final Context mContext;
     protected final View mTokenView;
@@ -96,11 +97,12 @@ public abstract class CoachMark {
     private final OnTimeoutListener mTimeoutListener;
     private final long mTimeoutInMs;
     private final boolean mShouldDismissOnAnchorDetach;
+    protected final boolean mPopupFitsSystemWindows;
 
     private Runnable mTimeoutDismissRunnable;
 
     protected Rect mDisplayFrame;
-    
+
     protected CoachMark(CoachMarkBuilder builder) {
         mAnchor = builder.anchor;
         mContext = builder.context;
@@ -110,49 +112,58 @@ public abstract class CoachMark {
         mTimeoutListener = builder.timeoutListener;
         mTokenView = builder.tokenView != null ? builder.tokenView : mAnchor;
         mPadding = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, builder.padding, 
+                TypedValue.COMPLEX_UNIT_DIP, builder.padding,
                 mContext.getResources().getDisplayMetrics());
         mShouldDismissOnAnchorDetach = builder.shouldDismissOnAnchorDetach;
+        mPopupFitsSystemWindows = builder.popupWindowFitToWindow;
 
         // Create the coach mark view
         View view = createContentView(builder.content);
-        
+
         // Create and initialise the PopupWindow
         mPopup = createNewPopupWindow(view);
-        
+        if (mPopupFitsSystemWindows) {
+            mPopup.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
+            mPopup.setHeight(WindowManager.LayoutParams.MATCH_PARENT);
+            mPopup.setFocusable(true); // full screen must be focusable
+        }
         mPopup.setAnimationStyle(builder.animationStyle);
         mPopup.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
-        mPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        if (builder.popupWindowBackgroundColor != null) {
+            mPopup.setBackgroundDrawable(new ColorDrawable(builder.popupWindowBackgroundColor));
+        } else {
+            mPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
 
         mPreDrawListener = new CoachMarkPreDrawListener();
         mOnAttachStateChangeListener = new CoachMarkOnAttachStateChangeListener();
     }
-    
+
     /**
      * Create the coach mark view
      */
     protected abstract View createContentView(View content);
-    
+
     /**
      * Create and initialise a new {@link PopupWindow}
      */
     protected abstract PopupWindow createNewPopupWindow(View contentView);
-    
+
     /**
      * Get the dimensions of the anchor view
      */
     protected abstract CoachMarkDimens<Integer> getAnchorDimens();
-    
+
     /**
      * Get the current dimensions of the popup window
      */
     protected abstract CoachMarkDimens<Integer> getPopupDimens(CoachMarkDimens<Integer> anchorDimens);
-    
+
     /**
      * Perform any necessary updates to the view when popupDimens or anchorDimens have changed
      */
     protected abstract void updateView(CoachMarkDimens<Integer> popupDimens, CoachMarkDimens<Integer> anchorDimens);
-    
+
     /**
      * Show the coach mark and start listening for changes to the anchor view
      */
@@ -161,19 +172,20 @@ public abstract class CoachMark {
         // the coach mark is visible - otherwise, the positioning may be off
         mDisplayFrame = getDisplayFrame(mAnchor);
         final CoachMarkDimens<Integer> anchorDimens = getAnchorDimens();
+
         final CoachMarkDimens<Integer> popupDimens = getPopupDimens(anchorDimens);
         updateView(popupDimens, anchorDimens);
 
         // Dismiss coach mark after the timeout has passed if it is greater than 0.
         if (mTimeoutInMs > 0) {
             mTimeoutDismissRunnable = () -> {
-                if(mPopup.isShowing()) {
+                if (mPopup.isShowing()) {
                     if (mTimeoutListener != null) {
                         mTimeoutListener.onTimeout();
                     }
                     try {
                         dismiss();
-                    } catch(IllegalArgumentException e) {
+                    } catch (IllegalArgumentException e) {
                         // Closes #19 - popup has already been removed outside of CornedBeef's
                         // control
                     }
@@ -182,8 +194,12 @@ public abstract class CoachMark {
             getContentView().postDelayed(mTimeoutDismissRunnable, mTimeoutInMs);
         }
 
-        mPopup.setWidth(popupDimens.width);
-        mPopup.showAtLocation(mTokenView, Gravity.NO_GRAVITY, popupDimens.x, popupDimens.y);
+        if (mPopupFitsSystemWindows) {
+            mPopup.showAtLocation(mTokenView, Gravity.NO_GRAVITY, 0, 0);
+        } else {
+            mPopup.showAtLocation(mTokenView, Gravity.NO_GRAVITY, popupDimens.x, popupDimens.y);
+            mPopup.setWidth(popupDimens.width);
+        }
 
         mAnchor.getViewTreeObserver().addOnPreDrawListener(mPreDrawListener);
         if (mShowListener != null) {
@@ -214,7 +230,7 @@ public abstract class CoachMark {
     public View getContentView() {
         return mPopup.getContentView();
     }
-    
+
     /**
      * Exposes the {@link PopupWindow#isShowing()} method of {@link CoachMark#mPopup}
      */
@@ -224,17 +240,17 @@ public abstract class CoachMark {
 
     /**
      * Exposes the {@link PopupWindow#setFocusable(boolean)} method of {@link CoachMark#mPopup}
-     *
+     * <p>
      * Set whether the coach mark is focusable or not
      * If we set the coach mark focusable, the behaviour changes as follows:
      * For Explore-by-Touch mode
-     *   1. Outside of this coach mark becomes un-touchable
-     *   2. The coach mark can be dismissed by pressing the hardware back button
-     *   3. Focus can only be traversed through elements inside the coach mark area
+     * 1. Outside of this coach mark becomes un-touchable
+     * 2. The coach mark can be dismissed by pressing the hardware back button
+     * 3. Focus can only be traversed through elements inside the coach mark area
      * For Non Explore-by-Touch mode
-     *   1. Touching outside the coach mark will dismiss it
-     *      This doesn't apply to HighlightCoachMarks, as they always have touchable set to false
-     *   2. The coach mark can be dismissed by pressing the hardware back button
+     * 1. Touching outside the coach mark will dismiss it
+     * This doesn't apply to HighlightCoachMarks, as they always have touchable set to false
+     * 2. The coach mark can be dismissed by pressing the hardware back button
      *
      * @param focusable whether or not this coach mark can be focused
      */
@@ -248,7 +264,7 @@ public abstract class CoachMark {
     public boolean isFocusable() {
         return mPopup.isFocusable();
     }
-    
+
     /**
      * Get the visible display size of the window this view is attached to
      */
@@ -257,23 +273,25 @@ public abstract class CoachMark {
         view.getWindowVisibleDisplayFrame(displayFrame);
         return displayFrame;
     }
-    
+
     /**
      * Listener which is used to update the position of the coach mark when the
      * position of the anchor view is about to change
      */
     private class CoachMarkPreDrawListener implements OnPreDrawListener {
-        
+
         @Override
         public boolean onPreDraw() {
-            if(mAnchor != null && mAnchor.isShown()) {
+            if (mAnchor != null && mAnchor.isShown()) {
                 CoachMarkDimens<Integer> anchorDimens = getAnchorDimens();
                 CoachMarkDimens<Integer> popupDimens = getPopupDimens(anchorDimens);
                 updateView(popupDimens, anchorDimens);
-                mPopup.update(popupDimens.x, popupDimens.y, popupDimens.width , popupDimens.height);
+                if (!mPopupFitsSystemWindows) {
+                    mPopup.update(popupDimens.x, popupDimens.y, popupDimens.width, popupDimens.height);
+                }
             } else {
                 dismiss();
-            }        
+            }
             return true;
         }
     }
@@ -303,12 +321,12 @@ public abstract class CoachMark {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
-            case MotionEvent.ACTION_UP:
-                dismiss();
-            case MotionEvent.ACTION_DOWN:
-                return true;
-            default:
-                return false;
+                case MotionEvent.ACTION_UP:
+                    dismiss();
+                case MotionEvent.ACTION_DOWN:
+                    return true;
+                default:
+                    return false;
             }
         }
     }
@@ -318,7 +336,6 @@ public abstract class CoachMark {
      * existing listener with a call to {@link CoachMark#dismiss()}
      *
      * @author lachie
-     *
      */
     protected class CoachMarkOnClickListener implements View.OnClickListener {
 
@@ -337,32 +354,32 @@ public abstract class CoachMark {
             }
         }
     }
-    
+
     public static class CoachMarkDimens<T extends Number> {
         public final T width;
         public final T height;
         public final T x;
         public final T y;
-                
+
         public CoachMarkDimens(T x, T y, T width, T height) {
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
         }
-        
+
         public Point getPos() {
             return new Point(x.intValue(), y.intValue());
         }
     }
-    
+
     public abstract static class CoachMarkBuilder {
-        
+
         // Required parameters
         protected Context context;
         protected View anchor;
         protected View content;
-        
+
         // Optional parameters with default values
         protected long timeout = 10000;
         protected OnDismissListener dismissListener;
@@ -372,6 +389,8 @@ public abstract class CoachMark {
         protected OnShowListener showListener;
         protected OnTimeoutListener timeoutListener;
         protected boolean shouldDismissOnAnchorDetach = true;
+        private Integer popupWindowBackgroundColor;
+        private boolean popupWindowFitToWindow;
 
         public CoachMarkBuilder(Context context, View anchor, String message) {
             this(context, anchor, new TextView(context));
@@ -382,53 +401,51 @@ public abstract class CoachMark {
         public CoachMarkBuilder(Context context, View anchor, @LayoutRes int contentResId) {
             this(context, anchor, LayoutInflater.from(context).inflate(contentResId, null));
         }
-        
+
         public CoachMarkBuilder(Context context, View anchor, View content) {
             this.context = context;
             this.anchor = anchor;
-            this.content = content;            
+            this.content = content;
         }
-        
+
         /**
          * If the desired anchor view does not contain a valid window token then
          * the token of an alternative view may be used to display the coach mark
-         * 
-         * @param tokenView
-         *      the view who's window token should be used
+         *
+         * @param tokenView the view who's window token should be used
          */
         public CoachMarkBuilder setTokenView(View tokenView) {
             this.tokenView = tokenView;
             return this;
         }
-       
+
         /**
          * Set the period of time after which the coach mark should be
          * automatically dismissed
-         * 
-         * @param timeoutInMs
-         *      the time in milliseconds after which to dismiss the coach
-         *      mark (defaults to 10 seconds)
+         *
+         * @param timeoutInMs the time in milliseconds after which to dismiss the coach
+         *                    mark (defaults to 10 seconds)
          */
         public CoachMarkBuilder setTimeout(long timeoutInMs) {
             this.timeout = timeoutInMs;
             return this;
         }
-        
+
         /**
          * Set how much padding there should be between the left and right edges
          * of the coach mark and the screen
-         * 
+         *
          * @param padding the amount of left/right padding in density-independent pixels (dip)
          */
         public CoachMarkBuilder setPadding(int padding) {
             this.padding = padding;
             return this;
         }
-        
+
         /**
          * Set an {@link CoachMark.OnDismissListener} to be called when the
          * coach mark is dismissed
-         * 
+         *
          * @param listener the onDismissListener
          */
         public CoachMarkBuilder setOnDismissListener(OnDismissListener listener) {
@@ -439,7 +456,7 @@ public abstract class CoachMark {
         /**
          * Set an {@link CoachMark.OnTimeoutListener} to be called when the
          * coach mark's display timeout has been expired
-         *
+         * <p>
          * This listener will be called before the coach mark dismissed
          *
          * @param listener the timeout listener
@@ -451,19 +468,18 @@ public abstract class CoachMark {
 
         /**
          * Set which animation will be used when displaying/hiding the coach mark
-         * 
-         * @param animationStyle
-         *      the resource ID of the Style to be used for showing and hiding the coach mark
+         *
+         * @param animationStyle the resource ID of the Style to be used for showing and hiding the coach mark
          */
         public CoachMarkBuilder setAnimation(@StyleRes int animationStyle) {
             this.animationStyle = animationStyle;
             return this;
         }
-        
+
         /**
          * Set an {@link CoachMark.OnShowListener} to be called when the
          * coach mark is shown
-         * 
+         *
          * @param listener
          */
         public CoachMarkBuilder setOnShowListener(OnShowListener listener) {
@@ -478,6 +494,16 @@ public abstract class CoachMark {
          */
         public CoachMarkBuilder setDismissOnAnchorDetach(boolean shouldDismissOnAnchorDetach) {
             this.shouldDismissOnAnchorDetach = shouldDismissOnAnchorDetach;
+            return this;
+        }
+
+        public CoachMarkBuilder setPopupWindowBackgroundColor(@ColorInt int popupWindowBackgroundColor) {
+            this.popupWindowBackgroundColor = popupWindowBackgroundColor;
+            return this;
+        }
+
+        public CoachMarkBuilder setPopupWindowFitsSystemWindows(boolean popupWindowFitToWindow) {
+            this.popupWindowFitToWindow = popupWindowFitToWindow;
             return this;
         }
 
