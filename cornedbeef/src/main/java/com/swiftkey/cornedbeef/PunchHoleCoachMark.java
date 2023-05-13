@@ -1,11 +1,14 @@
 package com.swiftkey.cornedbeef;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static com.swiftkey.cornedbeef.CoachMarkUtils.isRtlConfig;
+
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -20,9 +23,6 @@ import androidx.annotation.LayoutRes;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * The coach mark for a "punch hole" to present a transparent circle onto the given view.
@@ -87,7 +87,7 @@ public class PunchHoleCoachMark extends InternallyAnchoredCoachMark {
     }
 
     @Override
-    protected View createContentView(View content) {
+    protected View createContentView(View content, CoachMarkBuilder builder) {
         final PunchHoleView view = (PunchHoleView) LayoutInflater.from(mContext)
                 .inflate(R.layout.punchhole_coach_mark, null);
 
@@ -124,7 +124,7 @@ public class PunchHoleCoachMark extends InternallyAnchoredCoachMark {
         // However, if the width of the target view is smaller than the diameter
         // of the punch hole, just center the circle (no point in animating).
         final int startOffsetX = hasHorizontalTranslation()
-                ?  isRtlConfig()
+                ?  isRtlConfig(mContext)
                         ? mTargetViewLoc[0] + mTargetView.getWidth() - (int) mRelCircleRadius
                         : mTargetViewLoc[0] + (int) mRelCircleRadius
                 : (mTargetView.getWidth() / 2);
@@ -177,8 +177,8 @@ public class PunchHoleCoachMark extends InternallyAnchoredCoachMark {
             final int leftMostPosition = mTargetViewLoc[0] + (int) mRelCircleRadius;
             final int rightMostPosition = mTargetViewLoc[0] + mTargetView.getWidth() - (int) mRelCircleRadius;
 
-            final int startX = isRtlConfig() ? rightMostPosition : leftMostPosition;
-            final int endX = isRtlConfig() ? leftMostPosition : rightMostPosition;
+            final int startX = isRtlConfig(mContext) ? rightMostPosition : leftMostPosition;
+            final int endX = isRtlConfig(mContext) ? leftMostPosition : rightMostPosition;
 
             final ValueAnimator[] horizontalAnimations = new ValueAnimator[]{
                     ObjectAnimator.ofInt(mPunchHoleView, "circleCenterX", startX, endX),
@@ -205,19 +205,6 @@ public class PunchHoleCoachMark extends InternallyAnchoredCoachMark {
      */
     private boolean hasHorizontalTranslation() {
         return mHorizontalTranslationDuration > 0 && mTargetView.getWidth() > 2 * mRelCircleRadius;
-    }
-
-    /**
-     * For APIs above JELLY_BEAN_MR1, we can check if the locale of a device is
-     * LTR or RTL. Below that API, we assume it's LTR.
-     * We need this to show the horizontal translation from start to end
-     * (from left to right in LTR and from right to left in LTR), if possible.
-     * @return  whether the device has a RTL locale
-     */
-    private boolean isRtlConfig() {
-        final Configuration config = mAnchor.getResources().getConfiguration();
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1
-                && config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
     }
 
     public static class PunchHoleCoachMarkBuilder extends InternallyAnchoredCoachMarkBuilder {

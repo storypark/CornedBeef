@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.swiftkey.cornedbeef.PunchedLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/punched_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/bubble_coach_mark" />
+
+</com.swiftkey.cornedbeef.PunchedLayout>

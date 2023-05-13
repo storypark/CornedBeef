@@ -1,11 +1,14 @@
 package com.swiftkey.cornedbeef;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.Build;
+import android.view.View;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
 
 /**
  * Utils for calculating the size and position of the coach mark popup and pointy mark and for
@@ -118,5 +121,18 @@ public class CoachMarkUtils {
             //noinspection deprecation
             return context.getResources().getColor(colorRes);
         }
+    }
+
+    /**
+     * For APIs above JELLY_BEAN_MR1, we can check if the locale of a device is
+     * LTR or RTL. Below that API, we assume it's LTR.
+     * We need this to show the horizontal translation from start to end
+     * (from left to right in LTR and from right to left in LTR), if possible.
+     * @return  whether the device has a RTL locale
+     */
+    public static boolean isRtlConfig(@NonNull Context context) {
+        final Configuration config = context.getResources().getConfiguration();
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1
+                && config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
     }
 }

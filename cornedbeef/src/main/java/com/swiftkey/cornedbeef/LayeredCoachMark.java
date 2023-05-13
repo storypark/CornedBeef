@@ -19,7 +19,7 @@ public class LayeredCoachMark extends InternallyAnchoredCoachMark {
     }
 
     @Override
-    protected View createContentView(View content) {
+    protected View createContentView(View content, CoachMarkBuilder builder) {
         final LinearLayout container = (LinearLayout) LayoutInflater.from(mContext)
                 .inflate(R.layout.layered_coach_mark, null);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(

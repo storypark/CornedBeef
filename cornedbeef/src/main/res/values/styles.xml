@@ -5,5 +5,9 @@
         <item name="android:windowEnterAnimation">@anim/coach_mark_show</item>
         <item name="android:windowExitAnimation">@anim/coach_mark_hide</item>
     </style>
+    <style name="CoachMarkAnimation.PunchedBubble">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@anim/coach_mark_hide</item>
+    </style>
 
 </resources>

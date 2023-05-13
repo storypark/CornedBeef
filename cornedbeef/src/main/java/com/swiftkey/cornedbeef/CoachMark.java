@@ -20,6 +20,7 @@ import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.annotation.IntDef;
 import androidx.annotation.LayoutRes;
+import androidx.annotation.Px;
 import androidx.annotation.StyleRes;
 
 import java.lang.annotation.Retention;
@@ -88,7 +89,7 @@ public abstract class CoachMark {
     protected final Context mContext;
     protected final View mTokenView;
     protected final View mAnchor;
-    protected final int mPadding;
+    @Px protected final int mPadding;
 
     private final OnPreDrawListener mPreDrawListener;
     private final OnDismissListener mDismissListener;
@@ -118,7 +119,7 @@ public abstract class CoachMark {
         mPopupFitsSystemWindows = builder.popupWindowFitToWindow;
 
         // Create the coach mark view
-        View view = createContentView(builder.content);
+        View view = createContentView(builder.content, builder);
 
         // Create and initialise the PopupWindow
         mPopup = createNewPopupWindow(view);
@@ -142,7 +143,7 @@ public abstract class CoachMark {
     /**
      * Create the coach mark view
      */
-    protected abstract View createContentView(View content);
+    protected abstract View createContentView(View content, CoachMarkBuilder builder);
 
     /**
      * Create and initialise a new {@link PopupWindow}
@@ -393,7 +394,7 @@ public abstract class CoachMark {
         private boolean popupWindowFitToWindow;
 
         public CoachMarkBuilder(Context context, View anchor, String message) {
-            this(context, anchor, new TextView(context));
+            this(context, anchor, LayoutInflater.from(context).inflate(R.layout.coach_mark_text, null, false));
             ((TextView) content).setTextColor(Color.WHITE);
             ((TextView) content).setText(message);
         }

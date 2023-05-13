@@ -41,7 +41,8 @@ public class HighlightCoachMark extends InternallyAnchoredCoachMark {
         return popup;
     }
 
-    protected View createContentView(View content) {
+    @Override
+    protected View createContentView(View content, CoachMarkBuilder builder) {
         mView = LayoutInflater.from(mContext).inflate(R.layout.highlight_coach_mark, null);
         return mView;
     }

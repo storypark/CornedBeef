@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'maven-publish'
+    id 'kotlin-android'
 }
 
 def shortHeadVersion = { ->
@@ -20,8 +21,16 @@ android {
     namespace 'com.swiftkey.cornedbeef'
     compileSdkVersion 33
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjvm-default=all-compatibility']
+        jvmTarget = '17'
+    }
     defaultConfig {
-        minSdkVersion 12
+        minSdkVersion 21
         targetSdkVersion 33
         versionName shortHeadVersion
     }
